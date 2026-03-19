@@ -1,0 +1,117 @@
+import streamlit as st
+
+def render_teams(team_progress, epic_progress, epic_map, df):
+
+    for _, team in team_progress.iterrows():
+
+        team_name = team["team"]
+        team_percent = team["progress"]
+
+        st.subheader(f"{team_name} — {team_percent:.1f}%")
+
+        team_epics = epic_progress[
+            epic_progress["team"] == team_name
+        ].sort_values("progress")
+
+        for _, epic in team_epics.iterrows():
+
+            epic_key = epic["epic"]
+            epic_name = epic_map.get(epic_key, "")
+
+            done = epic["completed_items"]
+            total = epic["total_items"]
+            progress = epic["progress"]
+            
+            epic_all_items = df[df["epic"] == epic_key]
+
+            epic_owner_team = (
+                epic_all_items["team"]
+                .value_counts()
+                .idxmax()
+            )
+
+            team_label = ""
+
+            if epic_owner_team != team_name:
+                team_label = f" [{epic_owner_team}]"
+
+            epic_items = df[
+                (df["epic"] == epic_key) &
+                (df["team"] == team_name)
+            ]
+
+            done_count = epic_items[epic_items["done"] == 1].shape[0]
+
+            in_progress_count = epic_items[
+                epic_items["status"].isin([
+                    "FAZENDO",
+                    "CODE REVIEW",
+                    "PRONTO PARA TESTES",
+                    "EM QA",
+                    "BETA",
+                    "EM HOMOLOGAÇÃO",
+                    "PRONTO PARA STAGING",
+                    "STAGING"
+                ])
+            ].shape[0]
+
+            todo_count = epic_items.shape[0] - done_count - in_progress_count
+
+            epic_url = f"https://medcel.atlassian.net/browse/{epic_key}"
+
+            st.markdown(
+                f"""
+            <span style="font-size:18px; font-weight:600;">
+            <a href="{epic_url}" target="_blank">{epic_key}</a>
+            - {epic_name} ({done}/{total}){team_label}
+            </span>
+            """,
+                unsafe_allow_html=True
+            )
+
+            st.markdown(
+                f"✅ **FEITO:** {done_count} &nbsp;&nbsp; "
+                f"🔵 **EM ANDAMENTO:** {in_progress_count} &nbsp;&nbsp; "
+                f"⚪ **A FAZER:** {todo_count}"
+            )
+            
+            epic_total_items = df[df["epic"] == epic_key].shape[0]
+
+            if epic_total_items != total:
+                st.caption("📎 Épico com atividades compartilhadas")
+
+            st.progress(progress / 100)
+            
+            blocked_count = epic_items[epic_items["flagged"] == True].shape[0]
+
+            if blocked_count > 0:
+                st.warning(f"🚧 {blocked_count} item(ns) bloqueado(s) neste épico")
+
+            with st.expander("Ver itens do épico"):
+
+                for _, item in epic_items.sort_values("done").iterrows():
+
+                    is_blocked = item.get("flagged", False)
+
+                    if is_blocked:
+                        icon = "🚧"
+                    elif item["done"]:
+                        icon = "✅"
+                    else:
+                        icon = "⬜"
+
+                    issue_key = item["issue"]
+                    issue_url = f"https://medcel.atlassian.net/browse/{issue_key}"
+
+                    status = item["status"]
+
+                    blocked_label = ""
+                    if is_blocked:
+                        blocked_label = " 🚧 **BLOQUEADO**"
+
+                    st.markdown(
+                        f"{icon} **[{issue_key}]({issue_url})** - {item['summary']}{blocked_label}  \n"
+                        f"Status: `{status}`"
+                    )
+
+        st.divider()
