@@ -32,25 +32,7 @@ issues, epic_map = fetch_issues(jql)
 df = issues_to_dataframe(issues)
 
 epic_progress = calculate_epic_progress(df)
-
 team_progress = calculate_team_progress(epic_progress)
-
-cluster_progress = calculate_cluster_progress(team_progress)
-
-quarter_time_progress = calculate_quarter_time_progress()
-
-squads_at_risk, epics_at_risk, total_epics = calculate_risk_metrics(
-    epic_progress,
-    team_progress,
-    quarter_time_progress
-)
-
-col1, col2, col3, col4 = st.columns(4)
-
-col1.metric("Progresso de Épicos (geral)", f"{cluster_progress:.1f}%")
-col2.metric("% Tempo decorrido (quarter)", f"{quarter_time_progress:.1f}%")
-col3.metric("Potenciais squads em risco", squads_at_risk)
-col4.metric("Potenciais épicos em risco", f"{epics_at_risk} / {total_epics}")
 
 teams = sorted(team_progress["team"].unique())
 
@@ -60,13 +42,34 @@ selected_teams = st.sidebar.multiselect(
     default=teams
 )
 
-team_progress = team_progress[
-    team_progress["team"].isin(selected_teams)
-]
-
-epic_progress = epic_progress[
+filtered_epic_progress = epic_progress[
     epic_progress["team"].isin(selected_teams)
 ]
 
+filtered_team_progress = team_progress[
+    team_progress["team"].isin(selected_teams)
+]
 
-render_teams(team_progress, epic_progress, epic_map, df)
+cluster_progress = calculate_cluster_progress(filtered_team_progress)
+
+quarter_time_progress = calculate_quarter_time_progress()
+
+squads_at_risk, epics_at_risk, total_epics = calculate_risk_metrics(
+    filtered_epic_progress,
+    filtered_team_progress,
+    quarter_time_progress
+)
+
+col1, col2, col3, col4 = st.columns(4)
+
+col1.metric("Progresso de Épicos", f"{cluster_progress:.1f}%")
+col2.metric("% Tempo decorrido (quarter)", f"{quarter_time_progress:.1f}%")
+col3.metric("Potenciais squads em risco", squads_at_risk)
+col4.metric("Potenciais épicos em risco", f"{epics_at_risk} / {total_epics}")
+
+render_teams(
+    filtered_team_progress,
+    filtered_epic_progress,
+    epic_map,
+    df
+)
