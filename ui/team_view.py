@@ -57,17 +57,26 @@ def render_teams(team_progress, epic_progress, epic_map, df):
 
             todo_count = epic_items.shape[0] - done_count - in_progress_count
 
+            is_completed = done == total and total > 0
+
             epic_url = f"https://medcel.atlassian.net/browse/{epic_key}"
 
-            st.markdown(
-                f"""
-            <span style="font-size:18px; font-weight:600;">
-            <a href="{epic_url}" target="_blank">{epic_key}</a>
-            - {epic_name} ({done}/{total}){team_label}
-            </span>
-            """,
-                unsafe_allow_html=True
-            )
+            if is_completed:
+                epic_title = f"""
+                <span style="font-size:18px; font-weight:700; color:#2e7d32;">
+                <a href="{epic_url}" target="_blank">{epic_key}</a>
+                - {epic_name} ({done}/{total}){team_label} ✅ 100%
+                </span>
+                """
+            else:
+                epic_title = f"""
+                <span style="font-size:18px; font-weight:600;">
+                <a href="{epic_url}" target="_blank">{epic_key}</a>
+                - {epic_name} ({done}/{total}){team_label}
+                </span>
+                """
+
+            st.markdown(epic_title, unsafe_allow_html=True)
 
             st.markdown(
                 f"✅ **FEITO:** {done_count} &nbsp;&nbsp; "
