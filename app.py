@@ -27,7 +27,8 @@ jql = f"""
 labels = {label} AND issuetype = Epic
 """
 
-issues, epic_map = fetch_issues(jql)
+with st.spinner("Carregando dados do Jira..."):
+    issues, epic_map = fetch_issues(jql)
 
 df = issues_to_dataframe(issues)
 

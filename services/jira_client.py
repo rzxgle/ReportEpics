@@ -1,3 +1,4 @@
+import streamlit as st
 from jira import JIRA
 from config import *
 
@@ -9,7 +10,7 @@ def get_jira_client():
         basic_auth=(JIRA_EMAIL, JIRA_TOKEN)
     )
 
-
+@st.cache_data(ttl=300, show_spinner=False)
 def fetch_issues(jql):
 
     jira = get_jira_client()
