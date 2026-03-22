@@ -22,6 +22,10 @@ label = st.text_input(
 if not label:
     st.warning("Informe uma label para buscar os épicos.")
     st.stop()
+    
+if st.button("🔄 Atualizar dados"):
+    st.cache_data.clear()
+    st.rerun()
 
 jql = f"""
 labels = {label} AND issuetype = Epic
@@ -67,6 +71,8 @@ col1.metric("Progresso de Épicos", f"{cluster_progress:.1f}%")
 col2.metric("% Tempo decorrido (quarter)", f"{quarter_time_progress:.1f}%")
 col3.metric("Potenciais squads em risco", squads_at_risk)
 col4.metric("Potenciais épicos em risco", f"{epics_at_risk} / {total_epics}")
+
+st.caption("⏱️ Dados atualizados a cada 5 minutos")
 
 render_teams(
     filtered_team_progress,
