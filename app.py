@@ -36,6 +36,10 @@ with st.spinner("Carregando dados do Jira..."):
 
 df = issues_to_dataframe(issues)
 
+if df.empty:
+    st.warning("⚠️ Ainda não há histórias cadastradas para os épicos selecionados.")
+    st.stop()
+
 epic_progress = calculate_epic_progress(df)
 team_progress = calculate_team_progress(epic_progress)
 

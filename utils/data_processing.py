@@ -1,7 +1,6 @@
 import pandas as pd
 from config import *
-
-from domain.workflow_rules import is_done, is_ignored
+from domain.workflow_rules import get_priority
 
 def issues_to_dataframe(issues):
 
@@ -37,6 +36,8 @@ def issues_to_dataframe(issues):
         
         summary = issue.fields.summary
         status = issue.fields.status.name
+        
+        priority = get_priority(status, done, flagged)
 
         data.append({
             "issue": issue.key,
@@ -45,7 +46,8 @@ def issues_to_dataframe(issues):
             "team": team,
             "status": status,
             "done": done,
-            "flagged": flagged
+            "flagged": flagged,
+            "priority": priority
         })
 
     return pd.DataFrame(data)

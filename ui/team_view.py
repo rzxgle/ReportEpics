@@ -1,4 +1,5 @@
 import streamlit as st
+from domain.workflow_rules import is_in_progress, is_in_approval
 
 def render_teams(team_progress, epic_progress, epic_map, df):
 
@@ -42,20 +43,15 @@ def render_teams(team_progress, epic_progress, epic_map, df):
 
             done_count = epic_items[epic_items["done"] == 1].shape[0]
 
-            in_progress_count = epic_items[
-                epic_items["status"].isin([
-                    "FAZENDO",
-                    "CODE REVIEW",
-                    "PRONTO PARA TESTES",
-                    "EM QA",
-                    "BETA",
-                    "EM HOMOLOGAÇÃO",
-                    "PRONTO PARA STAGING",
-                    "STAGING"
-                ])
+            in_approval_count = epic_items[
+                epic_items["status"].apply(is_in_approval)
             ].shape[0]
 
-            todo_count = epic_items.shape[0] - done_count - in_progress_count
+            in_progress_count = epic_items[
+                epic_items["status"].apply(is_in_progress)
+            ].shape[0]
+
+            todo_count = epic_items.shape[0] - done_count - in_progress_count - in_approval_count
 
             is_completed = done == total and total > 0
 
@@ -80,6 +76,7 @@ def render_teams(team_progress, epic_progress, epic_map, df):
 
             st.markdown(
                 f"✅ **FEITO:** {done_count} &nbsp;&nbsp; "
+                f"🟣 **EM HOMOLOGAÇÃO:** {in_approval_count} &nbsp;&nbsp; "
                 f"🔵 **EM ANDAMENTO:** {in_progress_count} &nbsp;&nbsp; "
                 f"⚪ **A FAZER:** {todo_count}"
             )
@@ -97,22 +94,28 @@ def render_teams(team_progress, epic_progress, epic_map, df):
                 st.warning(f"🚧 {blocked_count} item(ns) bloqueado(s) neste épico")
 
             with st.expander("Ver itens do épico"):
+                
+                epic_items_sorted = epic_items.sort_values("priority")
 
-                for _, item in epic_items.sort_values("done").iterrows():
+                for _, item in epic_items_sorted.iterrows():
 
                     is_blocked = item.get("flagged", False)
 
+                    status = item["status"]
+                    
                     if is_blocked:
                         icon = "🚧"
                     elif item["done"]:
                         icon = "✅"
+                    elif is_in_approval(status):
+                        icon = "🟣"
+                    elif is_in_progress(status):
+                        icon = "🔵"
                     else:
-                        icon = "⬜"
+                        icon = "⚪"
 
                     issue_key = item["issue"]
-                    issue_url = f"https://medcel.atlassian.net/browse/{issue_key}"
-
-                    status = item["status"]
+                    issue_url = f"https://medcel.atlassian.net/browse/{issue_key}"                    
 
                     blocked_label = ""
                     if is_blocked:
