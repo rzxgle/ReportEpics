@@ -1,6 +1,6 @@
 import pandas as pd
 from config import *
-from domain.workflow_rules import get_priority
+from domain.workflow_rules import get_priority, is_done, is_ignored
 
 def issues_to_dataframe(issues):
 
@@ -31,11 +31,14 @@ def issues_to_dataframe(issues):
         team_obj = getattr(issue.fields, TEAM_FIELD, None)
         team = team_obj.name if team_obj else "Unknown Team"
 
-        status_category = issue.fields.status.statusCategory.name
-        done = 1 if status_category == "Done" else 0
+        #status_category = issue.fields.status.statusCategory.name
+        #done = 1 if status_category == "Done" else 0
         
         summary = issue.fields.summary
         status = issue.fields.status.name
+        
+        ignored = 1 if is_ignored(status) else 0
+        done = 1 if is_done(status) else 0
         
         priority = get_priority(status, done, flagged)
 
@@ -46,6 +49,7 @@ def issues_to_dataframe(issues):
             "team": team,
             "status": status,
             "done": done,
+            "ignored": ignored,
             "flagged": flagged,
             "priority": priority
         })
@@ -60,6 +64,7 @@ def issues_to_dataframe(issues):
             "team",
             "status",
             "done",
+            "ignored",
             "flagged",
             "priority"
         ])

@@ -50,7 +50,7 @@ def fetch_issues(jql):
     epic_string = ",".join(epic_keys)
 
     issues = jira.search_issues(
-        f'parent in ({epic_string}) AND status not in (Inválido, Cancelado)',
+        f'parent in ({epic_string})',
         maxResults=False
     )
 

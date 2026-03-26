@@ -1,5 +1,5 @@
 import streamlit as st
-from domain.workflow_rules import is_in_progress, is_in_approval
+from domain.workflow_rules import is_in_progress, is_in_approval, is_ignored
 
 def render_teams(team_progress, epic_progress, epic_map, df):
 
@@ -44,18 +44,37 @@ def render_teams(team_progress, epic_progress, epic_map, df):
 
             risk_label = " 🚨 Risco Sinalizado" if is_epic_at_risk else ""
             
+            progress_label = f"{progress:.1f}%"
+            
+            tooltip_text = (
+                "O cálculo de progresso não contabiliza cancelados ou inválidos, "
+                "sendo feito somente sobre a base de itens válidos."
+            )
+
+            progress_info = f"""
+            <span title="{tooltip_text}"
+                style="
+                    cursor: help;
+                    margin-left: 6px;
+                    font-size: 14px;
+                    color: #6b7280;
+                ">
+                ℹ️
+            </span>
+            """
+            
             if is_completed:
                 epic_title = f"""
                 <span style="font-size:18px; font-weight:700; color:#2e7d32;">
                 <a href="{epic_url}" target="_blank">{epic_key}</a>
-                - {epic_name} ({done}/{total}){team_label} ✅ 100% {risk_label}
+                - {epic_name} ({done}/{total}){team_label} ✅ {progress_label} {risk_label}
                 </span>
                 """
             else:
                 epic_title = f"""
                 <span style="font-size:18px; font-weight:600;">
                 <a href="{epic_url}" target="_blank">{epic_key}</a>
-                - {epic_name} ({done}/{total}){team_label} {risk_label}
+                - {epic_name} ({done}/{total}){team_label} {progress_label} {risk_label}
                 </span>
                 """
 
@@ -65,23 +84,20 @@ def render_teams(team_progress, epic_progress, epic_map, df):
                 st.caption("📝 Este épico ainda não possui histórias cadastradas")
             else:
                 done_count = epic_items[epic_items["done"] == 1].shape[0]
+                in_approval_count = epic_items[epic_items["status"].apply(is_in_approval)].shape[0]
+                in_progress_count = epic_items[epic_items["status"].apply(is_in_progress)].shape[0]
+                cancel_count = epic_items[epic_items["ignored"] == 1].shape[0]
+                todo_count = epic_items.shape[0] - done_count - in_progress_count - in_approval_count - cancel_count
 
-                in_approval_count = epic_items[
-                    epic_items["status"].apply(is_in_approval)
-                ].shape[0]
-
-                in_progress_count = epic_items[
-                    epic_items["status"].apply(is_in_progress)
-                ].shape[0]
-
-                todo_count = epic_items.shape[0] - done_count - in_progress_count - in_approval_count
-
-                st.markdown(
-                    f"✅ **CONCLUÍDO:** {done_count} &nbsp;&nbsp; "
-                    f"🟣 **EM HOMOLOGAÇÃO:** {in_approval_count} &nbsp;&nbsp; "
-                    f"🔵 **EM ANDAMENTO:** {in_progress_count} &nbsp;&nbsp; "
-                    f"⚪ **A FAZER:** {todo_count}"
-                )
+                st.markdown(f"""
+                <div style="font-size:15px; color:#6b7280; margin-top:4px; margin-bottom:8px;">
+                    <span>✅ Concluído: {done_count}</span> &nbsp;&nbsp;
+                    <span>🟣 Em homologação: {in_approval_count}</span> &nbsp;&nbsp;
+                    <span>🔵 Em andamento: {in_progress_count}</span> &nbsp;&nbsp;
+                    <span>⚪ A fazer: {todo_count}</span> &nbsp;&nbsp;
+                    <span>❌ Cancelados: {cancel_count}</span>
+                </div>
+                """, unsafe_allow_html=True)
 
             epic_total_items = df[df["epic"] == epic_key].shape[0]
             if epic_total_items != total and total > 0:
@@ -116,6 +132,8 @@ def render_teams(team_progress, epic_progress, epic_map, df):
                             icon = "🟣"
                         elif is_in_progress(status):
                             icon = "🔵"
+                        elif is_ignored(status):
+                            icon = "❌"
                         else:
                             icon = "⚪"
 

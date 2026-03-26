@@ -16,6 +16,8 @@ def calculate_epic_progress(df):
         epic_progress["completed_items"] /
         epic_progress["total_items"]
     ) * 100
+    
+    epic_progress["progress"] = epic_progress["progress"].fillna(0)
 
     return epic_progress
 
@@ -33,8 +35,8 @@ def calculate_team_progress(epic_progress):
     )
     
     team_progress["progress"] = (
-    team_progress["completed_items"] /
-    team_progress["total_items"]
+        team_progress["completed_items"] /
+        team_progress["total_items"]
     )
 
     team_progress["progress"] = team_progress["progress"].fillna(0) * 100

@@ -43,6 +43,8 @@ def is_ignored(status):
 def get_priority(status, done, flagged):
     if flagged:
         return 1  # 🚧 bloqueado
+    elif is_ignored(status):
+        return 6  # ❌ cancelado
     elif done:
         return 5  # ✅ concluído
     elif is_in_approval(status):
