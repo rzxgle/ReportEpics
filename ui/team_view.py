@@ -67,14 +67,14 @@ def render_teams(team_progress, epic_progress, epic_map, df):
                 epic_title = f"""
                 <span style="font-size:18px; font-weight:700; color:#2e7d32;">
                 <a href="{epic_url}" target="_blank">{epic_key}</a>
-                - {epic_name} ({done}/{total}){team_label} ✅ {progress_label} {risk_label}
+                - {epic_name} ({done}/{total}){team_label} — ✅ {progress_label} {risk_label}
                 </span>
                 """
             else:
                 epic_title = f"""
                 <span style="font-size:18px; font-weight:600;">
                 <a href="{epic_url}" target="_blank">{epic_key}</a>
-                - {epic_name} ({done}/{total}){team_label} {progress_label} {risk_label}
+                - {epic_name} ({done}/{total}){team_label} — {progress_label} {risk_label}
                 </span>
                 """
 
