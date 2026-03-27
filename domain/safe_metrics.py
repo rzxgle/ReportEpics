@@ -2,9 +2,11 @@ from datetime import date
 from config import QUARTER_START, QUARTER_END
 
 def calculate_epic_progress(df):
+    
+    valid_df = df[df["ignored"] == 0].copy()
 
     epic_progress = (
-        df.groupby(["team", "epic"])
+        valid_df.groupby(["team", "epic"])
         .agg(
             total_items=("issue", "count"),
             completed_items=("done", "sum")

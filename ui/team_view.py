@@ -99,7 +99,12 @@ def render_teams(team_progress, epic_progress, epic_map, df):
                 </div>
                 """, unsafe_allow_html=True)
 
-            epic_total_items = df[df["epic"] == epic_key].shape[0]
+            valid_items = df[df["ignored"] == 0]
+
+            epic_total_items = valid_items[
+                valid_items["epic"] == epic_key
+            ].shape[0]
+            
             if epic_total_items != total and total > 0:
                 st.caption("📎 Épico com atividades compartilhadas")
                 
