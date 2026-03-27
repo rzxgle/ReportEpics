@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from datetime import date
 from services.jira_client import fetch_issues
 from utils.data_processing import issues_to_dataframe
 from domain.safe_metrics import *
@@ -83,8 +84,75 @@ filtered_team_progress = team_progress[
     team_progress["team"].isin(selected_teams)
 ]
 
+def get_quarter_dates(year, quarter):
+    quarter_map = {
+        "Q1": (date(year, 1, 1), date(year, 3, 31)),
+        "Q2": (date(year, 4, 1), date(year, 6, 30)),
+        "Q3": (date(year, 7, 1), date(year, 9, 30)),
+        "Q4": (date(year, 10, 1), date(year, 12, 31)),
+    }
+    return quarter_map[quarter]
+
+def get_current_quarter(today):
+    month = today.month
+
+    if month <= 3:
+        return "Q1"
+    elif month <= 6:
+        return "Q2"
+    elif month <= 9:
+        return "Q3"
+    return "Q4"
+
+today = date.today()
+current_year = today.year
+current_quarter = get_current_quarter(today)
+
+period_mode = st.sidebar.selectbox(
+    "Período de referência",
+    ["Quarter atual", "Selecionar quarter", "Período customizado"]
+)
+
+if period_mode == "Quarter atual":
+    start_date, end_date = get_quarter_dates(current_year, current_quarter)
+    selected_period_label = f"{current_quarter}/{current_year}"
+
+elif period_mode == "Selecionar quarter":
+    selected_year = st.sidebar.selectbox(
+        "Ano",
+        [current_year - 1, current_year, current_year + 1],
+        index=1
+    )
+
+    selected_quarter = st.sidebar.selectbox(
+        "Quarter",
+        ["Q1", "Q2", "Q3", "Q4"],
+        index=["Q1", "Q2", "Q3", "Q4"].index(current_quarter)
+    )
+
+    start_date, end_date = get_quarter_dates(selected_year, selected_quarter)
+    selected_period_label = f"{selected_quarter}/{selected_year}"
+
+else:
+    custom_start = st.sidebar.date_input(
+        "Data inicial",
+        value=date(current_year, 1, 1)
+    )
+    custom_end = st.sidebar.date_input(
+        "Data final",
+        value=today
+    )
+
+    start_date = custom_start
+    end_date = custom_end
+    selected_period_label = f"{start_date.strftime('%d/%m/%Y')} até {end_date.strftime('%d/%m/%Y')}"
+
+if start_date >= end_date:
+    st.sidebar.error("A data final deve ser maior que a data inicial.")
+    st.stop()
+
 cluster_progress = calculate_cluster_progress(filtered_team_progress)
-quarter_time_progress = calculate_quarter_time_progress()
+quarter_time_progress = calculate_quarter_time_progress(start_date, end_date)
 
 squads_at_risk, epics_at_risk, total_epics = calculate_risk_metrics(
     filtered_epic_progress,
@@ -95,7 +163,8 @@ squads_at_risk, epics_at_risk, total_epics = calculate_risk_metrics(
 col1, col2, col3, col4 = st.columns(4)
 
 col1.metric("Progresso de Épicos", f"{cluster_progress:.1f}%")
-col2.metric("% Tempo decorrido (quarter)", f"{quarter_time_progress:.1f}%")
+col2.metric("% Tempo decorrido", f"{quarter_time_progress:.1f}%")
+#col2.caption(f"Período: {selected_period_label}")
 #col3.metric("Potenciais squads em risco", squads_at_risk)
 col3.metric("Épicos com risco sinalizado", f"{epics_at_risk} / {total_epics}")
 

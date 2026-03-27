@@ -54,19 +54,23 @@ def calculate_cluster_progress(team_progress):
 
     return (completed_items / total_items) * 100
 
-def calculate_quarter_time_progress():
+def calculate_quarter_time_progress(start_date, end_date):
 
     today = date.today()
 
-    total_days = (QUARTER_END - QUARTER_START).days
-    elapsed_days = (today - QUARTER_START).days
+    total_days = (end_date - start_date).days + 1
 
-    if elapsed_days < 0:
+    if total_days <= 0:
         return 0
 
-    if elapsed_days > total_days:
+    elapsed_days = (today - start_date).days + 1
+    
+    if elapsed_days < 0:
+        return 0
+    
+    if today >= end_date:
         return 100
-
+    
     return (elapsed_days / total_days) * 100
 
 def calculate_risk_metrics(epic_progress, team_progress, expected_progress):
