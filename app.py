@@ -3,7 +3,8 @@ import pandas as pd
 from datetime import date
 from services.jira_client import fetch_issues
 from utils.data_processing import issues_to_dataframe
-from utils.period_utils import get_quarter_dates, get_current_quarter
+from utils.period_utils import get_quarter_dates
+from utils.label_options import get_label_options, get_products, get_cycles, get_selection
 from domain.safe_metrics import *
 from ui.team_view import render_teams
 
@@ -15,28 +16,26 @@ st.set_page_config(
 
 st.title("🚀 Afya - Quarter Tracking")
 
-LABEL_OPTIONS = {
-    "Afya Bridge": {
-        "Q1": "EpicoPI1Legado",
-        "Q2": "EpicoPI2Legado",
-    },
-    "Afya One": {
-        "Q1": "PI1AfyaOne",
-        "Q2": "PI2AfyaOne",
-    }
-}
+label_options = get_label_options()
 
 selected_product = st.selectbox(
     "Produto",
-    list(LABEL_OPTIONS.keys())
+    get_products(label_options)
 )
 
 selected_cycle = st.selectbox(
     "Quarter / PI",
-    list(LABEL_OPTIONS[selected_product].keys())
+    get_cycles(label_options, selected_product)
 )
 
-label = LABEL_OPTIONS[selected_product][selected_cycle]
+selection = get_selection(label_options, selected_product, selected_cycle)
+
+label = selection["label"]
+quarter = selection["quarter"]
+year = selection["year"]
+
+start_date, end_date = get_quarter_dates(year, quarter)
+selected_period_label = f"{quarter}/{year}"
 
 st.caption(f"Filtro aplicado: {selected_product} | {selected_cycle}")
 
@@ -100,53 +99,6 @@ filtered_epic_progress = epic_progress[
 filtered_team_progress = team_progress[
     team_progress["team"].isin(selected_teams)
 ]
-
-today = date.today()
-current_year = today.year
-current_quarter = get_current_quarter(today)
-
-period_mode = st.sidebar.selectbox(
-    "Período de referência",
-    ["Quarter atual", "Selecionar quarter", "Período customizado"]
-)
-
-if period_mode == "Quarter atual":
-    start_date, end_date = get_quarter_dates(current_year, current_quarter)
-    selected_period_label = f"{current_quarter}/{current_year}"
-
-elif period_mode == "Selecionar quarter":
-    selected_year = st.sidebar.selectbox(
-        "Ano",
-        [current_year - 1, current_year, current_year + 1],
-        index=1
-    )
-
-    selected_quarter = st.sidebar.selectbox(
-        "Quarter",
-        ["Q1", "Q2", "Q3", "Q4"],
-        index=["Q1", "Q2", "Q3", "Q4"].index(current_quarter)
-    )
-
-    start_date, end_date = get_quarter_dates(selected_year, selected_quarter)
-    selected_period_label = f"{selected_quarter}/{selected_year}"
-
-else:
-    custom_start = st.sidebar.date_input(
-        "Data inicial",
-        value=date(current_year, 1, 1)
-    )
-    custom_end = st.sidebar.date_input(
-        "Data final",
-        value=today
-    )
-
-    start_date = custom_start
-    end_date = custom_end
-    selected_period_label = f"{start_date.strftime('%d/%m/%Y')} até {end_date.strftime('%d/%m/%Y')}"
-
-if start_date >= end_date:
-    st.sidebar.error("A data final deve ser maior que a data inicial.")
-    st.stop()
 
 cluster_progress = calculate_cluster_progress(filtered_team_progress)
 quarter_time_progress = calculate_quarter_time_progress(start_date, end_date)
