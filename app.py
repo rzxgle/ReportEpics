@@ -15,14 +15,30 @@ st.set_page_config(
 
 st.title("🚀 Afya - Quarter Tracking")
 
-label = st.text_input(
-    "Label do Épico",
-    value="EpicoPI1Legado"
+LABEL_OPTIONS = {
+    "Afya Bridge": {
+        "Q1": "EpicoPI1Legado",
+        "Q2": "EpicoPI2Legado",
+    },
+    "Afya One": {
+        "Q1": "PI1AfyaOne",
+        "Q2": "PI2AfyaOne",
+    }
+}
+
+selected_product = st.selectbox(
+    "Produto",
+    list(LABEL_OPTIONS.keys())
 )
 
-if not label:
-    st.warning("Informe uma label para buscar os épicos.")
-    st.stop()
+selected_cycle = st.selectbox(
+    "Quarter / PI",
+    list(LABEL_OPTIONS[selected_product].keys())
+)
+
+label = LABEL_OPTIONS[selected_product][selected_cycle]
+
+st.caption(f"Filtro aplicado: {selected_product} | {selected_cycle}")
 
 if st.button("🔄 Atualizar dados"):
     st.cache_data.clear()
