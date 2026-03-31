@@ -44,7 +44,7 @@ if st.button("🔄 Atualizar dados"):
     st.rerun()
 
 jql = f"""
-labels = {label} AND issuetype = Epic
+labels = {label} AND issuetype in (Epic,"Enabler Epic")
 """
 
 with st.spinner("Carregando dados do Jira..."):
