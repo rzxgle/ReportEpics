@@ -1,5 +1,4 @@
 from datetime import date
-from config import QUARTER_START, QUARTER_END
 
 def calculate_epic_progress(df):
     

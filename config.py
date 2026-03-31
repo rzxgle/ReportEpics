@@ -4,9 +4,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-QUARTER_START = date(2026, 1, 1)
-QUARTER_END = date(2026, 3, 31)
-
 JIRA_URL = os.getenv("JIRA_URL")
 JIRA_EMAIL = os.getenv("JIRA_EMAIL")
 JIRA_TOKEN = os.getenv("JIRA_TOKEN")
