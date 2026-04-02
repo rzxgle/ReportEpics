@@ -7,6 +7,7 @@ DONE_STATUS = [
     "Pronto p/ Deploy STG",
     "Ativação de valor",
     "PRONTO PARA MEDIÇÃO",
+    "Aprovação Comitê",
     "Concluído"
 ]
 
@@ -23,7 +24,6 @@ IN_PROGRESS_STATUS = [
 IN_APPROVAL_STATUS = [
     "Em Homologação",
     "Pronto para Staging",
-    "Aprovação Comitê",
     "Staging"
 ]
 
