@@ -45,7 +45,14 @@ def render_teams(team_progress, epic_progress, epic_map, df):
 
             epic_url = f"https://medcel.atlassian.net/browse/{epic_key}"
 
-            risk_label = " 🚨 Risco Sinalizado" if is_epic_at_risk else ""
+            risk_label = ""
+
+            if is_epic_at_risk:
+                risk_label = (
+                    '<span style="margin-left:8px; font-size:12px; '
+                    'background-color:#fee2e2; color:#991b1b; '
+                    'padding:2px 6px; border-radius:6px; font-weight:600;">🚨 Risco Sinalizado</span>'
+                )
             
             progress_label = f"{progress:.1f}%"
             
@@ -84,7 +91,7 @@ def render_teams(team_progress, epic_progress, epic_map, df):
             st.markdown(epic_title, unsafe_allow_html=True)
 
             if is_empty_epic:
-                st.caption("📝 Este épico ainda não possui histórias cadastradas")
+                st.caption("📝 Este épico ainda não possui histórias válidas cadastradas")
             else:
                 done_count = epic_items[epic_items["done"] == 1].shape[0]
                 in_approval_count = epic_items[epic_items["status"].apply(is_in_approval)].shape[0]
@@ -150,12 +157,25 @@ def render_teams(team_progress, epic_progress, epic_map, df):
 
                         blocked_label = ""
                         if is_blocked:
-                            blocked_label = " 🚧 **BLOQUEADO**"
+                            blocked_label = '<span style="margin-left:6px; color:#b45309; font-weight:600;">🚧 BLOQUEADO</span>'
 
                         st.markdown(
-                            f"{icon} **[{issue_key}]({issue_url})** - {item['summary']}{blocked_label}  \n"
-                            f"Status: `{status}`"
+                            f"""
+                            <p style="margin-bottom:10px; line-height:1.4; font-size:14px;">
+                                <span>{icon}</span>
+                                <a href="{issue_url}" target="_blank" style="font-weight:600; text-decoration:none;">
+                                    {issue_key}
+                                </a>
+                                <span style="color:#374151;"> - {item['summary']}</span>
+                                {blocked_label}<br>
+                                <span style="font-size:12px; color:#6b7280; margin-left:20px;">
+                                    Status: {status}
+                                </span>
+                            </p>
+                            """,
+                            unsafe_allow_html=True
                         )
+                                                
             elif not is_empty_epic:
                 st.caption("Sem itens para exibir")
 
