@@ -25,6 +25,7 @@ def render_teams(team_progress, epic_progress, epic_map, df):
             
             is_epic_at_risk = bool(epic.get("epic_risk", False))
             epic_risk_reason = epic.get("epic_risk_reason", "")
+            is_transbordo = bool(epic.get("is_transbordo", False))
 
             epic_items = df[
                 (df["epic"] == epic_key) &
@@ -85,18 +86,28 @@ def render_teams(team_progress, epic_progress, epic_map, df):
             </span>
             """
             
+            transbordo_badge = ""
+
+            if is_transbordo:
+                transbordo_badge = (
+                    '<span style="margin-left:8px; font-size:12px; '
+                    'background-color:#dbeafe; color:#1d4ed8; '
+                    'padding:2px 6px; border-radius:6px; font-weight:600;">'
+                    '🔁 Transbordo Quarter Anterior</span>'
+                )
+            
             if is_completed:
                 epic_title = f"""
                 <span style="font-size:18px; font-weight:700; color:#2e7d32;">
                 <a href="{epic_url}" target="_blank">{epic_key}</a>
-                - {epic_name} ({done}/{total}){team_label_html} — ✅ {progress_label} {risk_label} {blocked_badge}
+                - {epic_name} ({done}/{total}){team_label_html} — ✅ {progress_label} {risk_label} {blocked_badge} {transbordo_badge}
                 </span>
                 """
             else:
                 epic_title = f"""
                 <span style="font-size:18px; font-weight:600;">
                 <a href="{epic_url}" target="_blank">{epic_key}</a>
-                - {epic_name} ({done}/{total}){team_label_html} — {progress_label} {risk_label} {blocked_badge}
+                - {epic_name} ({done}/{total}){team_label_html} — {progress_label} {risk_label} {blocked_badge} {transbordo_badge}
                 </span>
                 """
 

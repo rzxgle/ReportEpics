@@ -30,7 +30,7 @@ selected_cycle = st.selectbox(
 
 selection = get_selection(label_options, selected_product, selected_cycle)
 
-label = selection["label"]
+labels = selection["labels"]
 quarter = selection["quarter"]
 year = selection["year"]
 
@@ -42,9 +42,11 @@ st.caption(f"Filtro aplicado: {selected_product} | {selected_cycle}")
 if st.button("🔄 Atualizar dados"):
     st.cache_data.clear()
     st.rerun()
+    
+labels_jql = ", ".join(labels)    
 
 jql = f"""
-labels = {label} AND issuetype in (Epic,"Enabler Epic")
+labels in ({labels_jql}) AND issuetype in (Epic,"Enabler Epic")
 """
 
 with st.spinner("Carregando dados do Jira..."):

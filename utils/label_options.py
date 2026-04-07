@@ -2,14 +2,14 @@ def get_label_options():
     return {
         "Afya Bridge": {
             "Q1": {
-                "label": "EpicoPI1Legado",
+                "labels": ["EpicoPI1Legado"],
                 "quarter": "Q1",
                 "year": 2026,
                 "display_name": "Quarter 1",
                 "description": "Ciclo Q1 Afya Bridge"
             },
             "Q2": {
-                "label": "EpicoPI2Legado",
+                "labels": ["EpicoPI2Legado", "LegadoTransbordoP126"],
                 "quarter": "Q2",
                 "year": 2026,
                 "display_name": "Quarter 2",
@@ -18,14 +18,14 @@ def get_label_options():
         },
         "Afya One": {
             "Q1": {
-                "label": "PI1AfyaOne",
+                "labels": ["PI1AfyaOne"],
                 "quarter": "Q1",
                 "year": 2026,
                 "display_name": "Quarter 1",
                 "description": "Ciclo Q1 Afya One"
             },
             "Q2": {
-                "label": "PI2AfyaOne",
+                "labels": ["PI2AfyaOne"],
                 "quarter": "Q2",
                 "year": 2026,
                 "display_name": "Quarter 2",
