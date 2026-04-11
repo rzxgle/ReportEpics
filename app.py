@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import date
 from services.jira_client import fetch_issues
 from utils.data_processing import issues_to_dataframe
-from utils.period_utils import get_quarter_dates
+from utils.period_utils import get_current_quarter, get_quarter_dates
 from utils.label_options import get_label_options, get_products, get_cycles, get_selection
 from domain.safe_metrics import *
 from ui.team_view import render_teams
@@ -23,9 +23,22 @@ selected_product = st.selectbox(
     get_products(label_options)
 )
 
+today = date.today()
+current_quarter = get_current_quarter(today)
+
+available_cycles = get_cycles(label_options, selected_product)
+
+if current_quarter in available_cycles:
+    default_cycle = current_quarter
+elif "Q2" in available_cycles:
+    default_cycle = "Q2"
+else:
+    default_cycle = available_cycles[0]
+
 selected_cycle = st.selectbox(
     "Quarter / PI",
-    get_cycles(label_options, selected_product)
+    available_cycles,
+    index=available_cycles.index(default_cycle)
 )
 
 selection = get_selection(label_options, selected_product, selected_cycle)
@@ -113,7 +126,7 @@ squads_at_risk, epics_at_risk, total_epics = calculate_risk_metrics(
 
 col1, col2, col3, col4 = st.columns(4)
 
-col1.metric("Progresso de Épicos", f"{cluster_progress:.1f}%")
+col1.metric("Progresso (Total de Histórias)", f"{cluster_progress:.1f}%")
 col2.metric("% Tempo decorrido", f"{quarter_time_progress:.1f}%")
 #col2.caption(f"Período: {selected_period_label}")
 #col3.metric("Potenciais squads em risco", squads_at_risk)
