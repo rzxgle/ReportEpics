@@ -19,7 +19,15 @@ def fetch_issues(jql):
     epics = jira.search_issues(
         jql,
         maxResults=False,
-        fields=["summary", "labels", TEAM_FIELD, "customfield_11806", "customfield_11839"] 
+        fields=[
+            "summary", 
+            "labels", 
+            TEAM_FIELD, # campo team
+            "customfield_11806", # Épico em risco
+            "customfield_11839", # Motivo do risco
+            "customfield_10505", # data inicio do épico
+            "duedate" # data fim do épico
+            ] 
     )
 
     epic_map = {epic.key: epic.fields.summary for epic in epics}
@@ -34,13 +42,17 @@ def fetch_issues(jql):
         risk_reason = getattr(epic.fields, "customfield_11839", None)
         epic_labels = getattr(epic.fields, "labels", []) or []
         is_transbordo = "LegadoTransbordoP126" in epic_labels
+        start_date = getattr(epic.fields, "customfield_10505", None)
+        end_date = getattr(epic.fields, "duedate", None)
 
         epic_data.append({
             "epic": epic.key,
             "team": team,
             "epic_risk": risk_value == "Sim",
             "epic_risk_reason": risk_reason if risk_reason else "",
-            "is_transbordo": is_transbordo
+            "is_transbordo": is_transbordo,
+            "start_date": start_date,
+            "end_date": end_date
         })
 
     epic_df = pd.DataFrame(epic_data)
