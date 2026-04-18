@@ -5,6 +5,8 @@ from services.jira_client import fetch_issues
 from utils.data_processing import issues_to_dataframe
 from utils.period_utils import get_current_quarter, get_quarter_dates
 from utils.label_options import get_label_options, get_products, get_cycles, get_selection
+from utils.roadmap_processing import build_roadmap_dataframe
+from utils.period_utils import get_quarter_dates, get_default_cycle
 from domain.safe_metrics import *
 from ui.team_view import render_teams
 
@@ -27,13 +29,7 @@ today = date.today()
 current_quarter = get_current_quarter(today)
 
 available_cycles = get_cycles(label_options, selected_product)
-
-if current_quarter in available_cycles:
-    default_cycle = current_quarter
-elif "Q2" in available_cycles:
-    default_cycle = "Q2"
-else:
-    default_cycle = available_cycles[0]
+default_cycle = get_default_cycle(available_cycles)
 
 selected_cycle = st.selectbox(
     "Quarter / PI",
@@ -96,6 +92,8 @@ if not empty_epics.empty:
 epic_progress["completed_items"] = epic_progress["completed_items"].fillna(0).astype(int)
 epic_progress["total_items"] = epic_progress["total_items"].fillna(0).astype(int)
 epic_progress["progress"] = epic_progress["progress"].fillna(0.0)
+
+roadmap_df = build_roadmap_dataframe(epic_progress, epic_df, epic_map)
 
 team_progress = calculate_team_progress(epic_progress)
 

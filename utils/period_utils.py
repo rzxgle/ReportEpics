@@ -19,3 +19,14 @@ def get_current_quarter(today):
     elif month <= 9:
         return "Q3"
     return "Q4"
+
+def get_default_cycle(available_cycles):
+    today = date.today()
+    current_quarter = get_current_quarter(today)
+
+    if current_quarter in available_cycles:
+        return current_quarter
+    elif "Q2" in available_cycles:
+        return "Q2"
+    else:
+        return available_cycles[0]
