@@ -16,10 +16,10 @@ def render_roadmap(roadmap_df, start_date=None, end_date=None):
         color="roadmap_status",
         text="progress_label",
         color_discrete_map={
-            "Em andamento": "#2563eb",
+            "Em andamento": "#5d84d9",
             "Concluído": "#16a34a",
             "Em risco": "#dc2626",
-            "Transbordo": "#7c3aed"
+            "Transbordo": "#956eda"
         },
         custom_data=[
             "team",
@@ -34,10 +34,10 @@ def render_roadmap(roadmap_df, start_date=None, end_date=None):
 
     fig.update_traces(
         textposition="inside",
-        insidetextanchor="middle",
-        textfont=dict(size=11, color="white"),
+        insidetextanchor="end",
+        textfont=dict(size=17, color="white"),
         marker_line_color="white",
-        marker_line_width=1.2,
+        marker_line_width=0,
         hovertemplate=
         "<b>%{customdata[1]}</b><br><br>" +
         "Squad: %{customdata[0]}<br>" +
@@ -130,20 +130,19 @@ def render_roadmap(roadmap_df, start_date=None, end_date=None):
     )
 
     fig.update_layout(
-        height=max(650, len(roadmap_df) * 38),
+        height=max(600, len(roadmap_df) * 45),
         legend_title="Status",
         legend=dict(
             orientation="h",
-            yanchor="bottom",
-            y=1.12,
-            xanchor="left",
+            yanchor="top",
+            y=-0.2,
+            xanchor="center",
             x=0
         ),
-        margin=dict(l=20, r=20, t=80, b=20),
+        margin=dict(l=20, r=20, t=80, b=80),
         plot_bgcolor="white",
         paper_bgcolor="white",
-        bargap=0.30,
-        font=dict(family="Arial, sans-serif", color="#111827")
+        bargap=0.30
     )
 
     st.plotly_chart(fig, use_container_width=True)
