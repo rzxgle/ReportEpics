@@ -26,9 +26,9 @@ def build_roadmap_dataframe(epic_progress, epic_df, epic_map):
         roadmap_df["team"].fillna("Sem time")
         + " | "
         + roadmap_df["epic"]
-        + " ("
-        + roadmap_df["progress"].fillna(0).round(1).astype(str)
-        + "%)"
+        #+ " ("
+        #+ roadmap_df["progress"].fillna(0).round(1).astype(str)
+        #+ "%)"
     )
 
     def classify_roadmap_status(row):
@@ -59,6 +59,10 @@ def build_roadmap_dataframe(epic_progress, epic_df, epic_map):
         roadmap_df["start_date"].dt.strftime("%d/%m/%Y")
         + " → "
         + roadmap_df["end_date"].dt.strftime("%d/%m/%Y")
+    )
+    
+    roadmap_df["epic_url"] = (
+    "https://medcel.atlassian.net/browse/" + roadmap_df["epic"]
     )
 
     return roadmap_df
