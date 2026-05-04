@@ -113,6 +113,9 @@ filtered_team_progress = team_progress[
     team_progress["team"].isin(selected_teams)
 ]
 
+total_completed = filtered_team_progress["completed_items"].sum()
+total_items = filtered_team_progress["total_items"].sum()
+
 cluster_progress = calculate_cluster_progress(filtered_team_progress)
 quarter_time_progress = calculate_quarter_time_progress(start_date, end_date)
 
@@ -124,7 +127,10 @@ squads_at_risk, epics_at_risk, total_epics = calculate_risk_metrics(
 
 col1, col2, col3, col4 = st.columns(4)
 
-col1.metric("Progresso (Total de Histórias)", f"{cluster_progress:.1f}%")
+col1.metric(
+    "Progresso (Total de Histórias)",
+    f"{cluster_progress:.1f}% ({total_completed}/{total_items})"
+)
 col2.metric("% Tempo decorrido", f"{quarter_time_progress:.1f}%")
 #col2.caption(f"Período: {selected_period_label}")
 #col3.metric("Potenciais squads em risco", squads_at_risk)
