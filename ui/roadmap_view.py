@@ -16,10 +16,11 @@ def render_roadmap(roadmap_df, start_date=None, end_date=None, quarter_time_prog
         color="roadmap_status",
         text="progress_label",
         color_discrete_map={
-            "Em andamento": "#5d84d9",
+            "Em andamento": "#537edb",
             "Concluído": "#16a34a",
-            "Em risco": "#dc2626",
-            "Transbordo": "#956eda"
+            "Em risco": "#f97316",
+            "Atrasado": "#e24242",
+            "Transbordo": "#935eee"
         },
         custom_data=[
             "team",
@@ -46,7 +47,7 @@ def render_roadmap(roadmap_df, start_date=None, end_date=None, quarter_time_prog
         "Período: %{customdata[3]}<br>" +
         "Status: %{customdata[4]}<br>" +
         "Risco: %{customdata[5]}<br>" +
-        "Tempo: %{customdata[7]}<br>" +
+        "Prazo: %{customdata[7]}<br>" +
         "Transbordo: %{customdata[6]}<extra></extra>"
     )
 

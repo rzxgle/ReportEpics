@@ -32,12 +32,22 @@ def build_roadmap_dataframe(epic_progress, epic_df, epic_map):
     )
 
     def classify_roadmap_status(row):
+        progress = row.get("progress", 0) or 0
+        end = row.get("end_date")
+        today = pd.to_datetime(date.today())
+
+        if progress >= 100:
+            return "Concluído"
+
+        if pd.notna(end) and today > end:
+            return "Atrasado"
+
         if row.get("epic_risk", False):
             return "Em risco"
+
         if row.get("is_transbordo", False):
             return "Transbordo"
-        if row.get("progress", 0) >= 100:
-            return "Concluído"
+
         return "Em andamento"
 
     roadmap_df["roadmap_status"] = roadmap_df.apply(
