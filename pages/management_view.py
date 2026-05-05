@@ -36,6 +36,7 @@ quarter = selection["quarter"]
 year = selection["year"]
 
 start_date, end_date = get_quarter_dates(year, quarter)
+quarter_time_progress = calculate_quarter_time_progress(start_date, end_date)
 selected_period_label = f"{quarter}/{year}"
 
 st.caption(f"Filtro aplicado: {selected_product} | {selected_cycle}")
@@ -116,4 +117,9 @@ col5.metric("📦 Total de épicos", total_epics)
 
 st.caption("⏱️ Dados atualizados a cada 5 minutos")
 
-render_roadmap(roadmap_df, start_date=start_date, end_date=end_date)
+render_roadmap(
+    roadmap_df,
+    start_date=start_date,
+    end_date=end_date,
+    quarter_time_progress=quarter_time_progress
+)

@@ -3,7 +3,7 @@ import plotly.express as px
 from datetime import date
 
 
-def render_roadmap(roadmap_df, start_date=None, end_date=None):
+def render_roadmap(roadmap_df, start_date=None, end_date=None, quarter_time_progress=None):
     if roadmap_df.empty:
         st.info("Nenhum épico com datas válidas para exibir no roadmap.")
         return
@@ -28,7 +28,8 @@ def render_roadmap(roadmap_df, start_date=None, end_date=None):
             "date_range_label",
             "roadmap_status",
             "risk_label",
-            "transbordo_label"
+            "transbordo_label",
+            "temporal_status"
         ]
     )
 
@@ -45,21 +46,51 @@ def render_roadmap(roadmap_df, start_date=None, end_date=None):
         "Período: %{customdata[3]}<br>" +
         "Status: %{customdata[4]}<br>" +
         "Risco: %{customdata[5]}<br>" +
+        "Tempo: %{customdata[7]}<br>" +
         "Transbordo: %{customdata[6]}<extra></extra>"
     )
 
     today = date.today()
 
-    # Área sombreada do quarter
+    # Áreas de tempo do quarter: passado x restante
     if start_date is not None and end_date is not None:
-        fig.add_vrect(
-            x0=start_date,
-            x1=end_date,
-            fillcolor="#e5e7eb",
-            opacity=0.28,
-            line_width=0,
-            layer="below"
-        )
+        if today < start_date:
+            fig.add_vrect(
+                x0=start_date,
+                x1=end_date,
+                fillcolor="#f3f4f6",
+                opacity=0.35,
+                line_width=0,
+                layer="below",
+                annotation_text="Quarter futuro",
+                annotation_position="top left",
+                annotation_font_size=11,
+                annotation_font_color="#6b7280"
+            )
+
+        elif today > end_date:
+            fig.add_vrect(
+                x0=start_date,
+                x1=end_date,
+                fillcolor="#fee2e2",
+                opacity=0.18,
+                line_width=0,
+                layer="below",
+                annotation_text="Quarter encerrado",
+                annotation_position="top left",
+                annotation_font_size=11,
+                annotation_font_color="#991b1b"
+            )
+
+        else:
+            fig.add_vrect(
+                x0=start_date,
+                x1=today,
+                fillcolor="#C6C6C6",
+                opacity=0.30,
+                line_width=0,
+                layer="below"
+            )
 
     # Limites do quarter
     if start_date is not None:
@@ -103,13 +134,18 @@ def render_roadmap(roadmap_df, start_date=None, end_date=None):
         line_dash="dash",
         line_color="#dc2626"
     )
+    
+    today_label = "Hoje"
+
+    if quarter_time_progress is not None:
+        today_label = f"Hoje • {quarter_time_progress:.1f}% do quarter"
 
     fig.add_annotation(
         x=today,
         y=1.08,
         xref="x",
         yref="paper",
-        text="Hoje",
+        text=today_label,
         showarrow=False,
         font=dict(size=12, color="#dc2626")
     )
