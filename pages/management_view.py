@@ -57,11 +57,9 @@ df = issues_to_dataframe(issues)
 
 epic_progress = calculate_epic_progress(df)
 
-epic_df_owner = epic_df.rename(columns={"team": "epic_owner_team"})
-
-epic_progress = epic_progress.merge(
-    epic_df_owner,
-    on="epic",
+epic_progress = epic_df.merge(
+    epic_progress,
+    on=["team", "epic"],
     how="left"
 )
 
