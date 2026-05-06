@@ -94,6 +94,13 @@ def build_roadmap_dataframe(epic_progress, epic_df, epic_map):
         classify_temporal_status,
         axis=1
     )
+    
+    roadmap_df.loc[
+        roadmap_df["temporal_status"] == "Sem datas",
+        "display_name"
+    ] = (
+        roadmap_df["display_name"] + " ⚠️ Sem datas"
+    )
 
     roadmap_df["epic_url"] = (
         "https://medcel.atlassian.net/browse/" + roadmap_df["epic"]

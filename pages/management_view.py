@@ -85,7 +85,7 @@ epic_progress["progress"] = epic_progress["progress"].fillna(0.0)
 
 roadmap_df = build_roadmap_dataframe(epic_progress, epic_df, epic_map)
 
-roadmap_df = roadmap_df.dropna(subset=["start_date", "end_date"])
+#roadmap_df = roadmap_df.dropna(subset=["start_date", "end_date"])
 
 teams = sorted(roadmap_df["team"].dropna().unique())
 

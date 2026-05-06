@@ -5,11 +5,19 @@ from datetime import date
 
 def render_roadmap(roadmap_df, start_date=None, end_date=None, quarter_time_progress=None):
     if roadmap_df.empty:
-        st.info("Nenhum épico com datas válidas para exibir no roadmap.")
+        st.info("Nenhum épico para exibir no roadmap.")
         return
+    
+    all_display_names = roadmap_df["display_name"].tolist()
 
+    plot_df = roadmap_df.dropna(subset=["start_date", "end_date"]).copy()
+
+    if plot_df.empty:
+        st.info("Nenhum épico com datas válidas para gerar barras no roadmap.")
+        return
+    
     fig = px.timeline(
-        roadmap_df,
+        plot_df,
         x_start="start_date",
         x_end="end_date",
         y="display_name",
@@ -155,7 +163,9 @@ def render_roadmap(roadmap_df, start_date=None, end_date=None, quarter_time_prog
         autorange="reversed",
         title=None,
         showgrid=False,
-        tickfont=dict(size=12, color="#111827")
+        tickfont=dict(size=12, color="#111827"),
+        categoryorder="array",
+        categoryarray=all_display_names[::-1]
     )
 
     fig.update_xaxes(
