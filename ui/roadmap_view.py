@@ -175,9 +175,14 @@ def render_roadmap(roadmap_df, start_date=None, end_date=None, quarter_time_prog
         tickfont=dict(size=11, color="#4b5563"),
         tickformat="%d/%m"
     )
+    
+    chart_height = min(
+        max(750, len(roadmap_df) * 48),
+        1800
+    )
 
     fig.update_layout(
-        height=max(600, len(roadmap_df) * 45),
+        height=chart_height,
         legend_title="Status",
         legend=dict(
             orientation="h",
