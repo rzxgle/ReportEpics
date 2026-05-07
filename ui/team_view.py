@@ -31,6 +31,10 @@ def render_teams(team_progress, epic_progress, epic_map, df):
                 (df["epic"] == epic_key) &
                 (df["team"] == team_name)
             ]
+            
+            all_epic_items = df[
+                df["epic"] == epic_key
+            ]
 
             is_empty_epic = total == 0
             is_completed = done == total and total > 0
@@ -150,7 +154,7 @@ def render_teams(team_progress, epic_progress, epic_map, df):
             if not epic_items.empty:
                 with st.expander("Ver itens do épico"):
 
-                    epic_items_sorted = epic_items.sort_values("priority")
+                    epic_items_sorted = all_epic_items.sort_values("priority")
 
                     for _, item in epic_items_sorted.iterrows():
 
@@ -172,27 +176,78 @@ def render_teams(team_progress, epic_progress, epic_map, df):
 
                         issue_key = item["issue"]
                         issue_url = f"https://medcel.atlassian.net/browse/{issue_key}"
+                        
+                        item_team = item.get("team", "Sem squad")
+
+                        item_team_badge = ""
+                        if item_team != team_name:
+                            item_team_badge = (
+                                f'<span style="margin-left:6px; font-size:12px; '
+                                f'background-color:#eef2ff; color:#3730a3; '
+                                f'padding:2px 6px; border-radius:6px; font-weight:600;">'
+                                f'{item_team}</span>'
+                            )
 
                         blocked_label = ""
                         if is_blocked:
                             blocked_label = '<span style="margin-left:6px; color:#b45309; font-weight:600;">🚧 BLOQUEADO</span>'
 
-                        st.markdown(
-                            f"""
-                            <p style="margin-bottom:10px; line-height:1.4; font-size:14px;">
-                                <span>{icon}</span>
-                                <a href="{issue_url}" target="_blank" style="font-weight:600; text-decoration:none;">
-                                    {issue_key}
-                                </a>
-                                <span style="color:#374151;"> - {item['summary']}</span>
-                                {blocked_label}<br>
-                                <span style="font-size:12px; color:#6b7280; margin-left:20px;">
-                                    Status: {status}
-                                </span>
-                            </p>
-                            """,
-                            unsafe_allow_html=True
-                        )
+                        summary = item["summary"]
+
+                        item_team = item.get("team", "Sem squad")
+
+                        item_team_badge = ""
+                        if item_team != team_name:
+                            item_team_badge = (
+                                f'<span style="margin-left:6px; font-size:12px; '
+                                f'background-color:#eef2ff; color:#3730a3; '
+                                f'padding:2px 6px; border-radius:6px; font-weight:300;">'
+                                f'{item_team}</span>'
+                            )
+
+                        blocked_label = ""
+                        if is_blocked:
+                            blocked_label = (
+                                '<span style="margin-left:6px; color:#b45309; font-size:12px;'
+                                'font-weight:600;">🚧 BLOQUEADO</span>'
+                            )
+
+                        st.html(f"""
+                        <div style="
+                            font-size:14px;
+                            line-height:1.4;
+                            margin-bottom:-15px;
+                        ">
+                            <span>{icon}</span>
+
+                            <a href="{issue_url}" target="_blank"
+                            style="
+                                font-weight:600;
+                                text-decoration:none;
+                                color:#2563eb;
+                            ">
+                                {issue_key}
+                            </a>
+
+                            <span style="color:#374151;">
+                                - {summary}
+                            </span>
+
+                            {item_team_badge}
+                            {blocked_label}
+                        </div>
+                        """)
+
+                        st.html(f"""
+                        <div style="
+                            font-size:12px;
+                            color:#6b7280;
+                            margin-left:20px;
+                            margin-bottom:5px;
+                        ">
+                            Status: {status}
+                        </div>
+                        """)
                                                 
             elif not is_empty_epic:
                 st.caption("Sem itens para exibir")
