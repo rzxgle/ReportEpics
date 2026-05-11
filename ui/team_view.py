@@ -23,6 +23,9 @@ def render_teams(team_progress, epic_progress, epic_map, df):
             total = int(epic["total_items"])
             progress = float(epic["progress"])
             
+            start_date = epic.get("start_date", None)
+            end_date = epic.get("end_date", None)
+            
             is_epic_at_risk = bool(epic.get("epic_risk", False))
             epic_risk_reason = epic.get("epic_risk_reason", "")
             is_transbordo = bool(epic.get("is_transbordo", False))
@@ -64,6 +67,21 @@ def render_teams(team_progress, epic_progress, epic_map, df):
             blocked_count = epic_items[epic_items["flagged"] == True].shape[0]
 
             blocked_badge = ""
+            
+            due_date_badge = ""
+
+            if end_date:
+                try:
+                    due_date_label = end_date.strftime("%d/%m")
+                except:
+                    due_date_label = str(end_date)
+
+                due_date_badge = (
+                    f'<span style="margin-left:8px; font-size:12px; '
+                    f'background-color:#f3f4f6; color:#374151; '
+                    f'padding:2px 6px; border-radius:6px; font-weight:600;">'
+                    f'📅 Fim: {due_date_label}</span>'
+                )
 
             if blocked_count > 0:
                 blocked_badge = (
@@ -104,14 +122,14 @@ def render_teams(team_progress, epic_progress, epic_map, df):
                 epic_title = f"""
                 <span style="font-size:18px; font-weight:700; color:#2e7d32;">
                 <a href="{epic_url}" target="_blank">{epic_key}</a>
-                - {epic_name} ({done}/{total}){team_label_html} — ✅ {progress_label} {risk_label} {blocked_badge} {transbordo_badge}
+                - {epic_name} ({done}/{total}){team_label_html} — ✅ {progress_label} {due_date_badge} {risk_label} {blocked_badge} {transbordo_badge}
                 </span>
                 """
             else:
                 epic_title = f"""
                 <span style="font-size:18px; font-weight:600;">
                 <a href="{epic_url}" target="_blank">{epic_key}</a>
-                - {epic_name} ({done}/{total}){team_label_html} — {progress_label} {risk_label} {blocked_badge} {transbordo_badge}
+                - {epic_name} ({done}/{total}){team_label_html} — {progress_label} {due_date_badge} {risk_label} {blocked_badge} {transbordo_badge}
                 </span>
                 """
 
