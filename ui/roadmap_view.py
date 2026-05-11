@@ -170,7 +170,7 @@ def render_roadmap(roadmap_df, start_date=None, end_date=None, quarter_time_prog
     today_label = "Hoje"
 
     if quarter_time_progress is not None:
-        today_label = f"Hoje • {quarter_time_progress:.1f}% do quarter"
+        today_label = f"Hoje"
 
     fig.add_annotation(
         x=today,
