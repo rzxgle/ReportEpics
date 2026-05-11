@@ -6,6 +6,7 @@ from services.jira_client import fetch_issues
 from utils.data_processing import issues_to_dataframe
 from domain.safe_metrics import *
 from utils.label_options import *
+from utils.sprint_config import get_sprints
 from utils.roadmap_processing import build_roadmap_dataframe
 
 st.set_page_config(page_title="Quarter Roadmap", layout="wide")
@@ -34,6 +35,8 @@ labels = selection["labels"]
 
 quarter = selection["quarter"]
 year = selection["year"]
+
+sprints = get_sprints(quarter, year)
 
 start_date, end_date = get_quarter_dates(year, quarter)
 quarter_time_progress = calculate_quarter_time_progress(start_date, end_date)
@@ -121,5 +124,6 @@ render_roadmap(
     roadmap_df,
     start_date=start_date,
     end_date=end_date,
-    quarter_time_progress=quarter_time_progress
+    quarter_time_progress=quarter_time_progress,
+    sprints=sprints
 )

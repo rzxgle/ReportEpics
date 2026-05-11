@@ -3,7 +3,7 @@ import plotly.express as px
 from datetime import date
 
 
-def render_roadmap(roadmap_df, start_date=None, end_date=None, quarter_time_progress=None):
+def render_roadmap(roadmap_df, start_date=None, end_date=None, quarter_time_progress=None, sprints=None):
     if roadmap_df.empty:
         st.info("Nenhum épico para exibir no roadmap.")
         return
@@ -95,7 +95,7 @@ def render_roadmap(roadmap_df, start_date=None, end_date=None, quarter_time_prog
             fig.add_vrect(
                 x0=start_date,
                 x1=today,
-                fillcolor="#C6C6C6",
+                fillcolor="#D8D8D8",
                 opacity=0.30,
                 line_width=0,
                 layer="below"
@@ -135,13 +135,36 @@ def render_roadmap(roadmap_df, start_date=None, end_date=None, quarter_time_prog
             showarrow=False,
             font=dict(size=11, color="#6b7280")
         )
+        
+    # Divisões de sprint
+    if sprints:
+        for sprint in sprints:
+
+            sprint_start = sprint["start"]
+
+            fig.add_vline(
+                x=sprint_start,
+                line_width=1,
+                line_dash="dot",
+                line_color="#d1d5db"
+            )
+
+            fig.add_annotation(
+                x=sprint_start,
+                y=1.01,
+                xref="x",
+                yref="paper",
+                text=sprint["name"],
+                showarrow=False,
+                font=dict(size=9, color="#9ca3af")
+            )
 
     # Linha de hoje
     fig.add_vline(
         x=today,
-        line_width=2.5,
+        line_width=1.5,
         line_dash="dash",
-        line_color="#dc2626"
+        line_color="#bfbfbf"
     )
     
     today_label = "Hoje"
