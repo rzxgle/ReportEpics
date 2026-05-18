@@ -193,10 +193,9 @@ def render_roadmap(roadmap_df, start_date=None, end_date=None, quarter_time_prog
 
     fig.update_xaxes(
         title=None,
-        showgrid=True,
-        gridcolor="#e5e7eb",
-        tickfont=dict(size=11, color="#4b5563"),
-        tickformat="%d/%m"
+        showgrid=False,
+        showticklabels=False,
+        zeroline=False
     )
     
     chart_height = min(
