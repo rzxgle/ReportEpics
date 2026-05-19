@@ -7,6 +7,7 @@ from utils.period_utils import get_current_quarter, get_quarter_dates
 from utils.label_options import get_label_options, get_products, get_cycles, get_selection
 from utils.roadmap_processing import build_roadmap_dataframe
 from utils.period_utils import get_quarter_dates, get_default_cycle
+from utils.dashboard_filters import get_available_teams, filter_by_teams
 from domain.safe_metrics import *
 from ui.team_view import render_teams
 
@@ -105,7 +106,7 @@ roadmap_df = build_roadmap_dataframe(epic_progress, epic_df, epic_map)
 
 team_progress = calculate_team_progress(epic_progress)
 
-teams = sorted(team_progress["team"].dropna().unique())
+teams = get_available_teams(team_progress)
 
 selected_teams = st.sidebar.multiselect(
     "Filtrar Squads",
@@ -113,13 +114,11 @@ selected_teams = st.sidebar.multiselect(
     default=teams
 )
 
-filtered_epic_progress = epic_progress[
-    epic_progress["team"].isin(selected_teams)
-]
-
-filtered_team_progress = team_progress[
-    team_progress["team"].isin(selected_teams)
-]
+filtered_epic_progress, filtered_team_progress = filter_by_teams(
+    epic_progress,
+    team_progress,
+    selected_teams
+)
 
 total_completed = filtered_team_progress["completed_items"].sum()
 total_items = filtered_team_progress["total_items"].sum()

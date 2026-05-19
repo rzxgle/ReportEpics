@@ -8,6 +8,8 @@ from domain.safe_metrics import *
 from utils.label_options import *
 from utils.sprint_config import get_sprints
 from utils.roadmap_processing import build_roadmap_dataframe
+from ui.team_view import render_teams
+from utils.dashboard_filters import get_available_teams, filter_by_teams
 
 st.set_page_config(page_title="Quarter Roadmap", layout="wide")
 
@@ -85,12 +87,13 @@ if not empty_epics.empty:
 epic_progress["completed_items"] = epic_progress["completed_items"].fillna(0).astype(int)
 epic_progress["total_items"] = epic_progress["total_items"].fillna(0).astype(int)
 epic_progress["progress"] = epic_progress["progress"].fillna(0.0)
+team_progress = calculate_team_progress(epic_progress)
 
 roadmap_df = build_roadmap_dataframe(epic_progress, epic_df, epic_map)
 
 #roadmap_df = roadmap_df.dropna(subset=["start_date", "end_date"])
 
-teams = sorted(roadmap_df["team"].dropna().unique())
+teams = get_available_teams(team_progress)
 
 selected_teams = st.sidebar.multiselect(
     "Filtrar Squads",
@@ -98,7 +101,15 @@ selected_teams = st.sidebar.multiselect(
     default=teams
 )
 
-roadmap_df = roadmap_df[roadmap_df["team"].isin(selected_teams)]
+filtered_epic_progress, filtered_team_progress = filter_by_teams(
+    epic_progress,
+    team_progress,
+    selected_teams
+)
+
+roadmap_df = roadmap_df[
+    roadmap_df["team"].isin(selected_teams)
+]
 
 summary_df = roadmap_df.drop_duplicates(subset=["epic"]).copy()
 
@@ -127,3 +138,15 @@ render_roadmap(
     quarter_time_progress=quarter_time_progress,
     sprints=sprints
 )
+
+st.divider()
+
+st.subheader(f"📋 Visão operacional ({total_epics} épicos)")
+
+with st.container():
+    render_teams(
+        filtered_team_progress,
+        filtered_epic_progress,
+        epic_map,
+        df
+    )
