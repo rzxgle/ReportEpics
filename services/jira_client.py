@@ -55,7 +55,18 @@ def fetch_issues(jql):
             "end_date": end_date
         })
 
-    epic_df = pd.DataFrame(epic_data)
+    epic_df = pd.DataFrame(
+        epic_data,
+        columns=[
+            "epic",
+            "team",
+            "epic_risk",
+            "epic_risk_reason",
+            "is_transbordo",
+            "start_date",
+            "end_date"
+        ]
+    )
 
     epic_keys = list(epic_map.keys())
 

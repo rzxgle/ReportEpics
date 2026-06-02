@@ -114,17 +114,29 @@ roadmap_df = roadmap_df[
 summary_df = roadmap_df.drop_duplicates(subset=["epic"]).copy()
 
 total_epics = summary_df["epic"].nunique()
-epics_at_risk = summary_df[summary_df["epic_risk"] == True]["epic"].nunique()
-transbordo_count = summary_df[summary_df["is_transbordo"] == True]["epic"].nunique()
-completed_count = summary_df[summary_df["progress"] >= 100]["epic"].nunique()
-in_progress_count = summary_df[
-    (summary_df["progress"] < 100)
+
+completed_count = summary_df[
+    summary_df["progress"] >= 100
 ]["epic"].nunique()
+
+delayed_count = summary_df[
+    summary_df["roadmap_status"] == "Atrasado"
+]["epic"].nunique()
+
+in_progress_count = summary_df[
+    (summary_df["progress"] < 100) &
+    (summary_df["roadmap_status"] != "Atrasado")
+]["epic"].nunique()
+
+completion_rate = 0
+
+if total_epics > 0:
+    completion_rate = (completed_count / total_epics) * 100
 
 col1, col2, col3, col4, col5 = st.columns(5)
 
-col1.metric("🚨 Épicos em risco", epics_at_risk)
-col2.metric("🔁 Transbordos", transbordo_count)
+col1.metric("% Épicos concluídos", f"{completion_rate:.1f}%")
+col2.metric("⏰ Épicos atrasados", delayed_count)
 col3.metric("✅ Concluídos", completed_count)
 col4.metric("🔵 Em andamento", in_progress_count)
 col5.metric("📦 Total de épicos", total_epics)
