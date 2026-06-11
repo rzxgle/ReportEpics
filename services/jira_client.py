@@ -41,7 +41,10 @@ def fetch_issues(jql):
         risk_value = getattr(risk_obj, "value", None) if risk_obj else None
         risk_reason = getattr(epic.fields, "customfield_11839", None)
         epic_labels = getattr(epic.fields, "labels", []) or []
-        is_transbordo = "LegadoTransbordoP126" in epic_labels
+        is_transbordo = any(
+            label in TRANSBORDO_LABELS
+            for label in epic_labels
+        )
         start_date = getattr(epic.fields, "customfield_10505", None)
         end_date = getattr(epic.fields, "duedate", None)
 

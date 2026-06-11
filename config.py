@@ -13,3 +13,8 @@ if not all([JIRA_URL, JIRA_EMAIL, JIRA_TOKEN]):
 
 EPIC_LINK_FIELD = "customfield_10006"
 TEAM_FIELD = "customfield_10001"
+
+TRANSBORDO_LABELS = {
+    "LegadoTransbordoP126",
+    "TransbordoPI2AfyaOne"
+}
