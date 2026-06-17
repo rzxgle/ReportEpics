@@ -14,6 +14,13 @@ def get_label_options():
                 "year": 2026,
                 "display_name": "Quarter 2",
                 "description": "Ciclo Q2 Afya Bridge"
+            },
+            "Q3": {
+                "labels": ["EpicoPI3Legado", "LegadoTransbordoP226"],
+                "quarter": "Q3",
+                "year": 2026,
+                "display_name": "Quarter 3",
+                "description": "Ciclo Q3 Afya Bridge"
             }
         },
         "Afya One": {
