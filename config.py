@@ -16,5 +16,6 @@ TEAM_FIELD = "customfield_10001"
 
 TRANSBORDO_LABELS = {
     "LegadoTransbordoP126",
+    "LegadoTransbordoP226",
     "TransbordoPI2AfyaOne"
 }
