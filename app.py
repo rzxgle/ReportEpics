@@ -78,7 +78,7 @@ epic_progress = calculate_epic_progress(df)
 #trecho que nao permite visão de dependencia entre squads
 epic_progress = epic_df.merge(
     epic_progress,
-    on=["team", "epic"],
+    on="epic",
     how="left"
 )
 

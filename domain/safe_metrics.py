@@ -5,7 +5,7 @@ def calculate_epic_progress(df):
     valid_df = df[df["ignored"] == 0].copy()
 
     epic_progress = (
-        valid_df.groupby(["team", "epic"])
+        valid_df.groupby("epic")
         .agg(
             total_items=("issue", "count"),
             completed_items=("done", "sum")
