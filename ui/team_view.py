@@ -138,11 +138,11 @@ def render_teams(team_progress, epic_progress, epic_map, df):
             if is_empty_epic:
                 st.caption("📝 Este épico ainda não possui histórias válidas cadastradas")
             else:
-                done_count = epic_items[epic_items["done"] == 1].shape[0]
-                in_approval_count = epic_items[epic_items["status"].apply(is_in_approval)].shape[0]
-                in_progress_count = epic_items[epic_items["status"].apply(is_in_progress)].shape[0]
-                cancel_count = epic_items[epic_items["ignored"] == 1].shape[0]
-                todo_count = epic_items.shape[0] - done_count - in_progress_count - in_approval_count - cancel_count
+                done_count = all_epic_items[all_epic_items["done"] == 1].shape[0]
+                in_approval_count = all_epic_items[all_epic_items["status"].apply(is_in_approval)].shape[0]
+                in_progress_count = all_epic_items[all_epic_items["status"].apply(is_in_progress)].shape[0]
+                cancel_count = all_epic_items[all_epic_items["ignored"] == 1].shape[0]
+                todo_count = all_epic_items.shape[0] - done_count - in_progress_count - in_approval_count - cancel_count
 
                 st.markdown(f"""
                 <div style="font-size:15px; color:#6b7280; margin-top:4px; margin-bottom:8px;">
