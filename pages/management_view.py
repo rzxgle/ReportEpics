@@ -101,6 +101,11 @@ selected_teams = st.sidebar.multiselect(
     default=teams
 )
 
+only_with_dates = st.sidebar.toggle(
+    "Exibir somente épicos com datas",
+    value=False
+)
+
 filtered_epic_progress, filtered_team_progress = filter_by_teams(
     epic_progress,
     team_progress,
@@ -110,6 +115,9 @@ filtered_epic_progress, filtered_team_progress = filter_by_teams(
 roadmap_df = roadmap_df[
     roadmap_df["team"].isin(selected_teams)
 ]
+
+if only_with_dates:
+    roadmap_df = roadmap_df.dropna(subset=["start_date", "end_date"])
 
 summary_df = roadmap_df.drop_duplicates(subset=["epic"]).copy()
 
