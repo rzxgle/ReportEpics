@@ -65,7 +65,7 @@ epic_progress = calculate_epic_progress(df)
 
 epic_progress = epic_df.merge(
     epic_progress,
-    on=["team", "epic"],
+    on="epic",
     how="left"
 )
 
