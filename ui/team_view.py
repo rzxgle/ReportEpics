@@ -7,8 +7,10 @@ def render_teams(team_progress, epic_progress, epic_map, df):
 
         team_name = team["team"]
         team_percent = team["progress"]
+        team_completed = int(team["completed_items"])
+        team_total = int(team["total_items"])
 
-        st.subheader(f"{team_name} — {team_percent:.1f}%")
+        st.subheader(f"{team_name} {team_completed}/{team_total} — {team_percent:.1f}%")
 
         team_epics = epic_progress[
             epic_progress["team"] == team_name
