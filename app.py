@@ -7,7 +7,17 @@ from utils.period_utils import get_current_quarter, get_quarter_dates
 from utils.label_options import get_label_options, get_products, get_cycles, get_selection
 from utils.roadmap_processing import build_roadmap_dataframe
 from utils.period_utils import get_quarter_dates, get_default_cycle
-from utils.dashboard_filters import get_available_teams, filter_by_teams
+from utils.dashboard_filters import (
+    get_available_teams,
+    filter_by_teams,
+    filter_by_projects
+)
+
+from utils.project_options import (
+    get_project_options,
+    get_project_views,
+    get_projects_for_view
+)
 from domain.safe_metrics import *
 from ui.team_view import render_teams
 
@@ -102,9 +112,32 @@ epic_progress["completed_items"] = epic_progress["completed_items"].fillna(0).as
 epic_progress["total_items"] = epic_progress["total_items"].fillna(0).astype(int)
 epic_progress["progress"] = epic_progress["progress"].fillna(0.0)
 
-roadmap_df = build_roadmap_dataframe(epic_progress, epic_df, epic_map)
+project_options = get_project_options()
 
-team_progress = calculate_team_progress(epic_progress)
+selected_project_view = st.sidebar.selectbox(
+    "Filtrar por projeto",
+    get_project_views(project_options)
+)
+
+selected_projects = get_projects_for_view(
+    project_options,
+    selected_project_view
+)
+
+project_filtered_epic_progress = filter_by_projects(
+    epic_progress,
+    selected_projects
+)
+
+team_progress = calculate_team_progress(
+    project_filtered_epic_progress
+)
+
+roadmap_df = build_roadmap_dataframe(
+    project_filtered_epic_progress,
+    epic_df,
+    epic_map
+)
 
 teams = get_available_teams(team_progress)
 
@@ -115,7 +148,7 @@ selected_teams = st.sidebar.multiselect(
 )
 
 filtered_epic_progress, filtered_team_progress = filter_by_teams(
-    epic_progress,
+    project_filtered_epic_progress,
     team_progress,
     selected_teams
 )

@@ -22,6 +22,7 @@ def fetch_issues(jql):
         fields=[
             "summary", 
             "labels", 
+            "project",
             TEAM_FIELD, # campo team
             "customfield_11806", # Épico em risco
             "customfield_11839", # Motivo do risco
@@ -37,6 +38,8 @@ def fetch_issues(jql):
     for epic in epics:
         team_obj = getattr(epic.fields, TEAM_FIELD, None)
         team = team_obj.name if team_obj else "Team Desconhecido"
+        project_obj = getattr(epic.fields, "project", None)
+        project = project_obj.key if project_obj else "Projeto Desconhecido"
         risk_obj = getattr(epic.fields, "customfield_11806", None)
         risk_value = getattr(risk_obj, "value", None) if risk_obj else None
         risk_reason = getattr(epic.fields, "customfield_11839", None)
@@ -51,6 +54,7 @@ def fetch_issues(jql):
         epic_data.append({
             "epic": epic.key,
             "team": team,
+            "project": project,
             "epic_risk": risk_value == "Sim",
             "epic_risk_reason": risk_reason if risk_reason else "",
             "is_transbordo": is_transbordo,
@@ -63,6 +67,7 @@ def fetch_issues(jql):
         columns=[
             "epic",
             "team",
+            "project",
             "epic_risk",
             "epic_risk_reason",
             "is_transbordo",
@@ -79,7 +84,7 @@ def fetch_issues(jql):
     epic_string = ",".join(epic_keys)
 
     issues = jira.search_issues(
-        f'parent in ({epic_string})',
+        f'parent in ({epic_string}) and issuetype not in (Design, "Tarefa épico", Epic, "Enabler Epic", Dependência, subtaskWorkTypes(), Tarefa)',
         maxResults=False
     )
 
