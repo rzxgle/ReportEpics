@@ -9,7 +9,17 @@ from utils.label_options import *
 from utils.sprint_config import get_sprints
 from utils.roadmap_processing import build_roadmap_dataframe
 from ui.team_view import render_teams
-from utils.dashboard_filters import get_available_teams, filter_by_teams
+from utils.dashboard_filters import (
+    get_available_teams,
+    filter_by_teams,
+    filter_by_projects
+)
+
+from utils.project_options import (
+    get_project_options,
+    get_project_views,
+    get_projects_for_view
+)
 
 st.set_page_config(page_title="Quarter Roadmap", layout="wide")
 
@@ -87,9 +97,32 @@ if not empty_epics.empty:
 epic_progress["completed_items"] = epic_progress["completed_items"].fillna(0).astype(int)
 epic_progress["total_items"] = epic_progress["total_items"].fillna(0).astype(int)
 epic_progress["progress"] = epic_progress["progress"].fillna(0.0)
-team_progress = calculate_team_progress(epic_progress)
+project_options = get_project_options()
 
-roadmap_df = build_roadmap_dataframe(epic_progress, epic_df, epic_map)
+selected_project_view = st.sidebar.selectbox(
+    "Filtrar por projeto",
+    get_project_views(project_options)
+)
+
+selected_projects = get_projects_for_view(
+    project_options,
+    selected_project_view
+)
+
+project_filtered_epic_progress = filter_by_projects(
+    epic_progress,
+    selected_projects
+)
+
+team_progress = calculate_team_progress(
+    project_filtered_epic_progress
+)
+
+roadmap_df = build_roadmap_dataframe(
+    project_filtered_epic_progress,
+    epic_df,
+    epic_map
+)
 
 #roadmap_df = roadmap_df.dropna(subset=["start_date", "end_date"])
 
@@ -107,7 +140,7 @@ only_with_dates = st.sidebar.toggle(
 )
 
 filtered_epic_progress, filtered_team_progress = filter_by_teams(
-    epic_progress,
+    project_filtered_epic_progress,
     team_progress,
     selected_teams
 )
