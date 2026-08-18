@@ -63,7 +63,7 @@ if st.button("🔄 Atualizar dados"):
 labels_jql = ", ".join(labels)
 
 jql = f"""
-labels in ({labels_jql}) AND issuetype in (Epic,"Enabler Epic")
+labels in ({labels_jql}) AND issuetype in (Epic,"Enabler Epic") and status != CANCELADO
 """
 
 with st.spinner("Carregando dados do Jira..."):
