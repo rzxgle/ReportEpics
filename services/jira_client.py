@@ -84,7 +84,7 @@ def fetch_issues(jql):
     epic_string = ",".join(epic_keys)
 
     issues = jira.search_issues(
-        f'parent in ({epic_string}) and issuetype not in (Design, "Tarefa épico", Epic, "Enabler Epic", Dependência, subtaskWorkTypes(), Tarefa)',
+        f'parent in ({epic_string}) and issuetype not in (Design, "Tarefa épico", Epic, "Enabler Epic", Dependência, subtaskWorkTypes(), Tarefa, Tema, "Alarme AWS")',
         maxResults=False
     )
 
